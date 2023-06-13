@@ -8,6 +8,7 @@
     window.addEventListener("DOMContentLoaded", async () => {
         const request = await fetch(`${host}${prefix}devices`);
         const response = await request.json();
+
         log(response)
 
         ConstructListOfEntries(response);
@@ -77,7 +78,7 @@
                 </li>`
     }
 
-    function OnEditPressed(node, entry) {
+    function OnEditPressed(node, device) {
         const field = node.querySelector(".textField.deviceName");
         let isEditing = field.disabled === false;
 
@@ -85,7 +86,7 @@
             StartEdit(node);
             this.initialValue = field.value;
         } else {
-            const promise = EndEdit(node, entry);
+            const promise = EndEdit(node, device);
 
             promise.catch(onRejected => {
                 log(onRejected);
@@ -125,14 +126,14 @@
         PrepareDeleteRequest(serial, port);
     }
 
-    function EndEdit(node, entry) {
+    function EndEdit(node, device) {
         let textNode = node.querySelector(".textField.deviceName");
         textNode.disabled = true;
         node.querySelector(".button").innerText = "Изменить";
 
         let name = textNode.value;
-        let serial = entry.Serial;
-        let port = entry.Port;
+        let serial = device.Serial;
+        let port = device.Port;
         let url = `${host}${prefix}device`;
 
         return SendRequest(url, {Name: name, Port: port}, "PUT");
@@ -146,6 +147,7 @@
 
     function PrepareDeleteRequest(serial, port) {
         let url = `${host}${prefix}device/disconnect`;
+        
         return SendRequest(url, {Port: port});
     }
 
@@ -169,8 +171,11 @@
     }
 
     async function UpdateList() {
+        log("Автоматический запрос на обновление:");
         const request = await fetch(`${host}${prefix}devices`);
         let devices = await request.json();
+        
+        log(devices);
 
         let container = document.getElementById("entriesList");
         const cachedDevices = container.querySelectorAll("li");
