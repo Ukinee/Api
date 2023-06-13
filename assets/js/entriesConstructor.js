@@ -2,7 +2,7 @@
 
     const host = `http://192.168.0.105/`;
     const prefix = `api/`;
-    const timeout = 15000;
+    const timeout = 10000;
     const {log} = console;
 
     window.addEventListener("DOMContentLoaded", async () => {
@@ -226,6 +226,11 @@
 
         const cachedName = nameNode.value;
         const cachedShareStatus = shareNode.checked;
+        
+        if(nameNode.disabled === false)
+        {
+            return;
+        }
 
         if (cachedName !== currentName || cachedShareStatus !== currentShareStatus) {
             nameNode.value = currentName;
